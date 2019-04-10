@@ -23,11 +23,11 @@ ins x []     = [(x,1)]
 ins x (y:ys) = if x == fst y
                then (x,succ(snd y)):ys
                else y : (ins x ys)
- 
+
 del :: Eq a  => a -> Bag a -> Bag a
 del a []     = []
 del a (x:xs) = if a == fst x
-               then (a,pred(snd x)):xs
+               then filter (\y -> (snd y) > 0) ((a,pred(snd x)):xs)
                else x : (del a xs)
 
 build_bag :: Eq a => [a] -> Bag a -> Bag a
