@@ -15,9 +15,13 @@ nullList  = []
 list = [2,3,3,5,7,7,7,8]
 bag1 :: Bag Int
 bag2 :: Bag Int
-bag1 = [(5,1),(7,3),(2,1),(3,2),(8,1)]
-bag2 = [(5,1),(3,6),(1,0),(8,7),(4,1)]
+bag1 = [(5,1),(7,3)]
+bag2 = [(5,1),(3,6)]
  
+{- | Insert item into bag
+>>> ins 5 bag1
+[(5,2),(7,3)]
+-}
 ins :: Eq a  => a -> Bag a -> Bag a
 ins x []     = [(x,1)]
 ins x (y:ys) = if x == fst y
