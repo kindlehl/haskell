@@ -1,7 +1,8 @@
 module HW1types where
  
 import Data.List (nub,sort)
- 
+import qualified Data.Set as Set
+
 type Node  = Int
 type Edge  = (Node,Node)
 type Graph = [Edge]
@@ -59,3 +60,48 @@ build_bag (x:xs) baggy = ins x (build_bag xs baggy)
 
 bag :: Eq a => [a] -> Bag a
 bag xs = build_bag xs []
+
+
+---------------------------------------------- 2-a
+g :: Graph
+g = [(1,2), (1,3), (2,3), (2,4), (3,4)]
+
+h :: Graph
+h = [(1,2), (1,3), (2,1), (3,2), (4,4)]
+
+fromEtoN:: Edge -> [Node]
+fromEtoN (x,y) = [x,y]
+
+fromGtoN:: Graph -> [Node]
+fromGtoN [(x,y)] = [x,y]
+fromGtoN (x:xs) = fromEtoN (x) ++ fromGtoN xs 
+
+makeSet :: Ord a => [a] -> [a]
+makeSet = makeSet' Set.empty where
+makeSet' _ [] = []
+makeSet' a (b : c) = if Set.member b a then makeSet' a c else b : makeSet' (Set.insert b a) c
+
+nodes :: Graph -> [Node]
+nodes graph = makeSet(fromGtoN graph)
+               
+---------------------------------------------- 2-b
+successor:: Node -> Edge -> [Node]
+successor z (x,y) = case z == x of 
+                   True  -> [y]
+                   False -> []
+
+suc:: Node -> Graph -> [Node]
+suc z [(x,y)] = successor z (x,y)
+suc z (x:xs) = successor z (x) ++ suc z xs
+
+---------------------------------------------- 2-c
+remNode:: Node -> Edge -> [Edge]
+remNode z (x,y) = if (z /= x && z /= y) then [(x,y)] else []
+
+detach :: Node -> Graph -> Graph
+detach z [(x,y)] = remNode z (x,y)
+detach z (x:xs) = remNode z (x) ++ detach z xs
+
+---------------------------------------------- 2-d
+cyc::Int -> Graph
+cyc z = zip [1 .. z-1][2 .. z] ++ [(z,1)]
