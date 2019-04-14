@@ -40,11 +40,11 @@ ins x (y:ys) = if x == fst y
 []
 -}
 
+-- 1-b
 del :: Eq a  => a -> Bag a -> Bag a
 del a []     = []
-del a (x:xs) = if a == fst x
-               then filter (\y -> (snd y) > 0) ((a,pred(snd x)):xs)
-               else x : (del a xs)
+del a (x:xs) | a == fst x = filter (\y -> (snd y) > 0) ((a,pred(snd x)):xs)
+             | otherwise  = x : (del a xs)
 
 {- | Build bag from list
 >>> bag ["Toyota", "Fiat", "Honda", "Fiat"]
@@ -105,3 +105,48 @@ detach z (x:xs) = remNode z (x) ++ detach z xs
 ---------------------------------------------- 2-d
 cyc::Int -> Graph
 cyc z = zip [1 .. z-1][2 .. z] ++ [(z,1)]
+
+------------------------------------------------ Shapes
+
+type Number = Int
+type Point = (Number,Number)
+type Length = Number
+data Shape = Pt Point
+		   | Circle Point Length
+		   | Rect 	Point Length Length
+		     deriving Show
+type Figure = [Shape]
+type BBox = (Point,Point)
+
+point = Pt (1,1)
+circle = Circle (2,2) 2
+rectangle = Rect (3,3) 3 3
+f = [Pt (4,4), Circle (5,5) 3, Rect (3,3) 7 2]
+
+---------------------------------------------- 3-a
+width :: Shape -> Length
+width (Pt p) 			= 0
+width (Circle p l)		= l*2
+width (Rect p l1 l2) 	= l1 * l2
+
+---------------------------------------------- 3-b
+bbox :: Shape -> BBox
+bbox (Pt p) 		= (p, p)
+bbox (Circle p l) 	= ((fst p - l, fst p - l),((snd p + l),(snd p + l)))
+bbox (Rect p l1 l2)	= (p, ((fst p + l1),(snd p + l2)))
+
+---------------------------------------------- 3-c
+minX :: Shape -> Number
+minX (Pt p)	= fst p
+minX (Circle p l) | fst p - l <= snd p - l 	= fst p - l
+		  | otherwise				= snd p - l
+minX (Rect p l1 l2) | fst p <= snd p = fst p
+		    | otherwise		 = snd p
+					
+---------------------------------------------- 3-d
+move :: Shape -> Point -> Shape
+					
+					
+					
+addPt :: Point -> Point -> Point
+
