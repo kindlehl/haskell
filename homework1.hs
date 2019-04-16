@@ -73,7 +73,7 @@ isbag (x:xs) ys | check x ys = x : isbag xs ys
                 | otherwise  = isbag xs ys
 
 
-{- | Testing subbag, isbag
+{- | Testing subbag, isbag, size
 >>> subbag [(7,3),(2,1)] [(5,1),(7,3),(2,1),(3,2),(8,1)]
 True
 >>> isbag [(2,1),(3,2),(8,3)] [(5,1),(7,3),(2,1),(3,2),(8,1)]
@@ -82,19 +82,25 @@ True
 6
 >>> size [(5,1),(7,3),(2,1),(3,2),(8,1)]
 8
+>>> subbag bag1 bag2
+False
+>>> isbag bag1 bag2
+[(5,1)]
+>>> size bag1
+8
 -}
 
 size :: Bag a -> Int
 size [] = 0
 size (x:xs) = snd x + size xs
 
---Graphs
+---------------------------------------------- Question 2
 
 type Node  = Int
 type Edge  = (Node,Node)
 type Graph = [Edge]
 type Path  = [Node]
----------------------------------------------- Question 2
+
 g :: Graph
 g = [(1,2), (1,3), (2,3), (2,4), (3,4)]
 
@@ -102,6 +108,14 @@ h :: Graph
 h = [(1,2), (1,3), (2,1), (3,2), (4,4)]
 
 {- | Testing graphs
+>>> nodes g
+[1,2,3,4]
+>>> suc 2 g
+[3,4]
+>>> suc 4 g
+[]
+>>> suc 4 h
+[4]
 >>> nodes h
 [1,2,3,4]
 >>> nodes [(1,9), (2,27)]
@@ -114,6 +128,10 @@ h = [(1,2), (1,3), (2,1), (3,2), (4,4)]
 [(1,9),(1,29)]
 >>> detach 1 [(1,1), (1,7), (1,9), (2,27), (1,29)]
 [(2,27)]
+>>> detach 3 g
+[(1,2),(2,4)]
+>>> detach 2 h
+[(1,3),(4,4)]
 >>> cyc 4
 [(1,2),(2,3),(3,4),(4,1)]
 >>> cyc 1
@@ -198,6 +216,8 @@ Rect (4,5) 7 2
 [Pt (0,4),Pt (0,4),Circle (1,4) 1]
 >>> inside (f!!0) (f!!1)
 True
+>>> inside (f!!1) (f!!2)
+False
 -}
 
 width :: Shape -> Length
