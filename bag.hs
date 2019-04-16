@@ -155,7 +155,7 @@ f         = [Pt (4,4), Circle (5,5) 3, Rect (3,3) 7 2]
 width :: Shape -> Length
 width (Pt p)         = 0
 width (Circle p l)   = l*2
-width (Rect p l1 l2) = l1 * l2
+width (Rect p l1 l2) = l1
 
 ---------------------------------------------- 3-b
 bbox :: Shape -> BBox
@@ -163,6 +163,9 @@ bbox (Pt p)         = (p, p)
 bbox (Circle p l)   = ((fst p - l, fst p - l),((snd p + l),(snd p + l)))
 bbox (Rect p l1 l2) = (p, ((fst p + l1),(snd p + l2)))
 
+{- | 
+>>> map bbox f
+-}
 ---------------------------------------------- 3-c
 minX :: Shape -> Number
 minX (Pt p)    = fst p
@@ -171,7 +174,33 @@ minX (Circle p l) | fst p - l <= snd p - l = fst p - l
 minX (Rect p l1 l2) | fst p <= snd p = fst p
                     | otherwise      = snd p
                     
+{- | 
+>>> map minX f
+-}
 ---------------------------------------------- 3-d
---move :: Shape -> Point -> Shape
---addPt :: Point -> Point -> Point
+move :: Shape -> Point -> Shape
+move (Pt p) v   = (Pt (addPt p v))
+move (Rect p l1 l2) v = (Rect (addPt p v) l1 l2)
+move (Circle p l) v = (Circle (addPt p v) l)
 
+addPt :: Point -> Point -> Point
+addPt (x1, y1) (x2, y2) = (x1+x2, y1+y2)
+
+alignLeft::Figure -> Figure
+alignLeft x = map (moveToX (minimum(map minX f))) x
+
+moveToX::Number-> Shape -> Shape
+moveToX n (Pt (x,y)) = (Pt (n, y))
+moveToX n (Circle (x,y) l) = (Circle (n+l, y) l)
+moveToX n (Rect (x,y) l1 l2) = (Rect (n, y) l1 l2)
+
+inside::Shape -> Shape -> Bool
+inside a b = (inCheck (bbox a) (bbox b))
+
+inCheck::BBox -> BBox -> Bool
+inCheck ((a,b), (c,d)) ((e,f),(g,h)) = (lineCheck [e, f, c, d] [a, b, g, h])
+
+lineCheck::[Int] -> [Int] -> Bool
+lineCheck [] [] = True
+lineCheck (x:xs) (y:ys) | x <= y && lineCheck xs ys = True
+                        | otherwise = False
