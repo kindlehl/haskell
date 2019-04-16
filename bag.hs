@@ -75,6 +75,48 @@ type Node  = Int
 type Edge  = (Node,Node)
 type Graph = [Edge]
 type Path  = [Node]
+---------------------------------------------- 2-a
+g :: Graph
+g = [(1,2), (1,3), (2,3), (2,4), (3,4)]
+
+h :: Graph
+h = [(1,2), (1,3), (2,1), (3,2), (4,4)]
+
+{- | Testing graphs
+>>> nodes h
+[1,2,3,4]
+
+>>> nodes [(1,9), (2,27)]
+[1,9,2,27]
+
+>>> suc 1 [(1,9), (2,27), (1,29)]
+[9,29]
+
+>>> suc 2 [(1,9), (2,27), (1,29)]
+[27]
+
+>>> detach 2 [(1,9), (2,27), (1,29)]
+[(1,9),(1,29)]
+
+>>> detach 1 [(1,1), (1,7), (1,9), (2,27), (1,29)]
+[(2,27)]
+
+>>> cyc 4
+[(1,2),(2,3),(3,4),(4,1)]
+
+>>> cyc 1
+[(1,1)]
+
+>>> cyc 2
+[(1,2),(2,1)]
+-}
+
+fromEtoN:: Edge -> [Node]
+fromEtoN (x,y) = [x,y]
+
+fromGtoN:: Graph -> [Node]
+fromGtoN [(x,y)] = [x,y]
+fromGtoN (x:xs) = fromEtoN (x) ++ fromGtoN xs 
 
 graph1 :: Graph
 graph2 :: Graph
@@ -123,6 +165,17 @@ circle = Circle (2,2) 2
 rectangle = Rect (3,3) 3 3
 f = [Pt (4,4), Circle (5,5) 3, Rect (3,3) 7 2]
 
+{- | Tests for bbox
+>>> map width [Pt (4,4), Circle (5,5) 3, Rect (3,3) 7 2]
+[0,6,14]
+
+>>> map bbox [Pt (4,4), Circle (5,5) 3, Rect (3,3) 7 2]
+[((4,4),(4,4)),((2,2),(8,8)),((3,3),(10,5))]
+
+>>> map minX [Pt (4,4), Circle (5,5) 3, Rect (3,3) 7 2]
+[4,2,3]
+-}
+---------------------------------------------- 3-a
 width :: Shape -> Length
 width (Pt p) 			= 0
 width (Circle p l)		= l*2
