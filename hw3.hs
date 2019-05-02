@@ -89,16 +89,16 @@ data Mode = Up
 		  | Down
 		    deriving (Eq, Show)
 
-type State = (Mode,Int,Int)
+type State2 = (Mode,Int,Int)
 type Line = (Int, Int, Int, Int)
 type Lines = [Line]
 
-semS :: Cmd3 -> State -> (State, Lines)
+semS :: Cmd3 -> State2 -> (State2, Lines)
 semS (Pen mode)   	(ms, x, y) 	= ((mode, x, y),[])
 semS (Moveto xd yd) (ms, x, y) 	| ms == Up 		= ((Up  , xd, yd)	, [])
 								| ms == Down 	= ((Down, xd, yd)	, [(x, y, xd, yd)])
 
-semS (Seq c1 c2)	(ms, x, y) 	= {-State-} (fst(semS c2 ( fst ( semS c1 (ms, x, y) ) )), 
+semS (Seq c1 c2)	(ms, x, y) 	= {-State2-} (fst(semS c2 ( fst ( semS c1 (ms, x, y) ) )), 
 								  {-Lines-}	snd ( semS c1 (ms, x, y) ) ++ snd (semS c2 ( fst ( semS c1 (ms, x, y) ) )))
 
 sem' :: Cmd3 -> Lines
