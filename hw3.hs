@@ -1,3 +1,85 @@
+import Data.List
+
+---------------------------------- Ex 1 ------------------------------
+data Cmd = LD Int
+         | ADD
+         | MULT
+         | DUP
+         | DEF String Prog
+         | CALL String
+         deriving Show
+
+
+type Stack = [Int]
+type D = Maybe Stack -> Maybe Stack
+
+semCmd :: Cmd -> D
+semCmd (LD e)  s1  = case s1 of  
+                    Just xs -> Just (e:xs)
+                    _ -> Nothing
+semCmd (ADD)  s1   = case s1 of  
+                    Just (e:e':xs) -> Just([e + e'] ++ xs)
+                    _ -> Nothing
+semCmd (MULT)  s1  = case s1 of  
+                    Just (e:e':xs) -> Just([e * e'] ++ xs)
+                    _ -> Nothing
+semCmd (DUP)  s1  = case s1 of  
+                    Just (e:xs) -> Just(e:e:xs)
+                    _ -> Nothing
+
+type Prog = [Cmd]
+sem :: Prog -> D
+sem [] s1 = s1
+sem (x:xs) s1 = sem xs (semCmd x s1)
+
+test1 = [LD 3, DUP, ADD, DUP, MULT]
+test2 = [LD 3, ADD]
+test3 = []
+
+---------------------------------- Ex 2 ------------------------------
+
+---------------------------------- 2-a --------------------------------
+-- Added in Exercise 1
+
+---------------------------------- 2-b --------------------------------
+
+type Macros = [(String, Prog)]
+type State = Maybe (Stack, Macros) -> Maybe (Stack, Macros)
+
+semCmd2 :: Cmd -> State
+semCmd2 (LD x) commandseq =  case commandseq of  
+                    Just (xs, m) -> Just (x:xs, m)
+                    _ -> Nothing
+semCmd2 (ADD) commandseq =  case commandseq of  
+                    Just (x:x':xs, m) -> Just([x + x'] ++ xs, m)
+                    _ -> Nothing
+semCmd2 (MULT) commandseq  = case commandseq of  
+                    Just (x:x':xs, m) -> Just([x * x'] ++ xs, m)
+                    _ -> Nothing
+semCmd2 (DUP) commandseq = case commandseq of  
+                    Just (x:xs, m) -> Just(x:x:xs, m)
+                    _ -> Nothing
+semCmd2 (DEF macroname prog) commandseq = case commandseq of
+                            Just (xs, m) -> Just(xs, (macroname,prog):m)
+                            _ -> Nothing
+semCmd2 (CALL macroname) commandseq = case commandseq of
+                            Just (xs, m) -> 
+                                case findDef macroname  m of
+                                    Just (n, prog)-> sem2 prog commandseq
+                                    _->Nothing
+
+findDef :: String -> Macros -> Maybe(String, Prog) 
+findDef macroname commandseq = find (\c -> fst c == macroname) commandseq
+
+---------------------------------- 2-c --------------------------------
+
+sem2 :: Prog -> State
+sem2 []     commandseq = commandseq
+sem2 (x:xs) commandseq = sem2 xs (semCmd2 x commandseq) 
+
+
+
+---------------------------------- Ex 3 ------------------------------
 data Cmd3 = Pen Mode
 		 | Moveto Int Int
 		 | Seq Cmd3 Cmd3
